@@ -1,0 +1,11 @@
+﻿ @page "/"
+@inject NavigationManager Navigation
+
+<p>Opening School Directory...</p>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.NavigateTo("/schools");
+    }
+}

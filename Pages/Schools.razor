@@ -1,8 +1,11 @@
 @page "/schools"
-@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using SchoolDirectoryApp.Models
 @using SchoolDirectoryApp.Services
 @using SchoolDirectoryApp.Components
+@inject SchoolService SchoolService
+@rendermode InteractiveServer
 @inject SchoolService SchoolService
 
 <PageTitle>School Directory</PageTitle>
