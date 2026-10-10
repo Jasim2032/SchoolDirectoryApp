@@ -9,9 +9,9 @@ public class SchoolService
 
     public SchoolService(HttpClient http) => _http = http;
 
-    // Throws HttpRequestException on failure -> handled in Schools.razor
     public async Task<List<School>> GetSchoolsAsync()
     {
+      //  await Task.Delay(5000);   // TEMPORARY
         var result = await _http.GetFromJsonAsync<List<School>>("api/school");
         return result ?? new List<School>();
     }
