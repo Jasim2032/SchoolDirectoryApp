@@ -1,0 +1,112 @@
+@page "/schools"
+@rendermode InteractiveServer
+@using SchoolDirectoryApp.Models
+@using SchoolDirectoryApp.Services
+@using SchoolDirectoryApp.Components
+@inject SchoolService SchoolService
+
+<PageTitle>School Directory</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">School Directory</h1>
+    <button class="btn btn-outline-primary" @onclick="LoadSchools">Refresh</button>
+</div>
+
+@if (error)
+{
+    <p class="text-danger">
+        Unable to retrieve school data.
+    </p>
+}
+else if (schools == null)
+{
+    <p>Loading schools...</p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-7">
+            <div class="d-flex gap-2 mb-3">
+                <input @bind="Search"
+                       @bind:event="oninput"
+                       class="form-control"
+                       placeholder="Search school..." />
+                <button class="btn btn-outline-secondary" @onclick="ToggleSort">
+                    Sort @(sortAsc ? "Z-A" : "A-Z")
+                </button>
+            </div>
+
+            <p class="text-muted">@FilteredSchools.Count() school(s) found</p>
+
+            <div class="row g-3">
+                @foreach (var s in FilteredSchools)
+                {
+                    <div class="col-12 col-lg-6">
+                        <SchoolCard School="s"
+                                    OnSelect="HandleSelect"
+                                    IsSelected="@(selectedSchool?.SchoolId == s.SchoolId)" />
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            @if (selectedSchool is null)
+            {
+                <p class="text-muted">Select a school to view its details.</p>
+            }
+            else
+            {
+                <SchoolDetails School="selectedSchool" />
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<School>? schools;
+    private School? selectedSchool;
+    private bool error;
+    private bool sortAsc = true;
+    private string Search { get; set; } = string.Empty;
+
+    private IEnumerable<School> FilteredSchools
+    {
+        get
+        {
+            var query = schools ?? Enumerable.Empty<School>();
+
+            if (!string.IsNullOrWhiteSpace(Search))
+            {
+                query = query.Where(s =>
+                    s.SchoolName != null &&
+                    s.SchoolName.Contains(Search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return sortAsc
+                ? query.OrderBy(s => s.SchoolName)
+                : query.OrderByDescending(s => s.SchoolName);
+        }
+    }
+
+    protected override async Task OnInitializedAsync() => await LoadSchools();
+
+    private async Task LoadSchools()
+    {
+        error = false;
+        schools = null;          // triggers the loading message
+        selectedSchool = null;
+        try
+        {
+            schools = await SchoolService.GetSchoolsAsync();
+        }
+        catch (Exception)
+        {
+            error = true;        // triggers the error message
+        }
+    }
+
+    private void HandleSelect(School school) => selectedSchool = school;
+
+    private void ToggleSort() => sortAsc = !sortAsc;
+}
