@@ -1,0 +1,16 @@
+// ---- Add to Program.cs (before builder.Build()) ----
+using SchoolDirectoryApp.Services;
+
+builder.Services.AddHttpClient<SchoolService>(client =>
+{
+    client.BaseAddress = new Uri("https://edutots.net/");
+});
+
+// Make sure interactive server components are enabled:
+// builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+// app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+// ---- Add to Components/_Imports.razor (or root _Imports.razor) ----
+// @using SchoolDirectoryApp.Models
+// @using SchoolDirectoryApp.Services
+// @using SchoolDirectoryApp.Components
